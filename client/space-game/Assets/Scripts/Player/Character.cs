@@ -29,11 +29,6 @@ public class Character : MonoBehaviour, ICharacter
     public CharacterType CharacterType { get; set; }
     public Ship Ship { get; set; }
 
-    public void Awake()
-    {
-        Ship = new Ship();
-    }
-
     public void TakeDamage(int damageAmount)
     {
         Ship.Health -= damageAmount;

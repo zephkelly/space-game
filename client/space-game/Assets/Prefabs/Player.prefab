@@ -99,6 +99,7 @@ GameObject:
   - component: {fileID: -5948852812382342105}
   - component: {fileID: 3375560761336150190}
   - component: {fileID: 3375560761336150189}
+  - component: {fileID: 8591573354226063467}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -171,7 +172,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f24ed95f963bab40b9c953360dcbad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _character: {fileID: -5948852812382342105}
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  character: {fileID: 0}
 --- !u!114 &-5948852812382342105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,7 +202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 0
   _assetId: 2873875189
-  serverOnly: 1
+  serverOnly: 0
   visible: 0
   hasSpawned: 0
 --- !u!114 &3375560761336150189
@@ -213,14 +217,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab2cbc52526ea384ba280d13cd1a57b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
+  syncDirection: 1
   syncMode: 0
   syncInterval: 0.1
   target: {fileID: 3375560761336150191}
-  clientAuthority: 0
+  clientAuthority: 1
   syncVelocity: 1
   clearVelocity: 0
   velocitySensitivity: 0.1
   syncAngularVelocity: 1
   clearAngularVelocity: 0
   angularVelocitySensitivity: 0.1
+--- !u!114 &8591573354226063467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3375560761336150188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 3375560761336150193}
+  clientAuthority: 1
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChange: 1
+  onlySyncOnChangeCorrectionMultiplier: 2
+  rotationSensitivity: 0.01
+  compressRotation: 0
+  positionPrecision: 0.01
+  scalePrecision: 0.01
