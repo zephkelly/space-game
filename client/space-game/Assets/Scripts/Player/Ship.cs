@@ -24,6 +24,7 @@ public enum ShipPrimaryWeapon
 
 public enum ShipSecondaryWeapon
 {
+  None,
   Missile,
   Mine,
   Torpedo
@@ -31,6 +32,7 @@ public enum ShipSecondaryWeapon
 
 public enum ShipSpecialWeapon
 {
+  None,
   EMP,
   Shield,
   Cloak
@@ -84,9 +86,9 @@ public class Ship
     switch (ShipEngine)
     {
       case ShipEngine.Ion:
-        EngineSpeed = 100;
+        EngineSpeed = 30;
         EngineAcceleration = 100;
-        EngineTurnSpeed = 100;
+        EngineTurnSpeed = 5;
         break;
       case ShipEngine.Rocket:
         EngineSpeed = 100;

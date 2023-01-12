@@ -175,7 +175,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  character: {fileID: 0}
+  character: {fileID: -5948852812382342105}
+  cameraObject: {fileID: 8752693268186972622, guid: 60cab6b4363997b44979c808f9a9ed31, type: 3}
 --- !u!114 &-5948852812382342105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +245,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   target: {fileID: 3375560761336150193}
-  clientAuthority: 1
+  clientAuthority: 0
   syncPosition: 1
   syncRotation: 1
   syncScale: 0
