@@ -15,7 +15,7 @@ public class PlayerController : NetworkBehaviour
   private InputManager inputManager;
   private ControlScheme controlScheme;
   [SerializeField]
-  private GameObject cameraObject;
+  private GameObject cameraPrefab;
   private CameraManager cameraManager;
 
   private Rigidbody2D playerRigid2D;
@@ -40,11 +40,8 @@ public class PlayerController : NetworkBehaviour
     Vector3 cameraSpawnPos = new Vector3(playerTransform.position.x, playerTransform.position.y, -10f);
 
     cameraManager = new CameraManager(
-      Instantiate(
-        cameraObject,
-        cameraSpawnPos,
-        Quaternion.identity
-      ),
+      Instantiate(cameraPrefab, cameraSpawnPos, Quaternion.identity),
+      playerTransform,
       inputManager
     );
   }
@@ -63,7 +60,7 @@ public class PlayerController : NetworkBehaviour
   {
     if (!isLocalPlayer) return;
     
-    inputManager.UpdateInput();
+    inputManager.UpdateInput(playerTransform.position);
     LookAtMouse();
   }
 
@@ -72,29 +69,31 @@ public class PlayerController : NetworkBehaviour
     if (!isLocalPlayer) return;
 
     Move(controlScheme);
+    cameraManager.FollowPlayer();
 
     //Linear drag
     playerRigid2D.AddForce(-playerRigid2D.velocity * playerRigid2D.mass, ForceMode2D.Force);
       if (playerRigid2D.velocity.magnitude < 0.1f) playerRigid2D.velocity = Vector2.zero;
   }
 
-  private void LookAtMouse()
+  private void LookAtMouse(bool lerpRotation = false)
   {
-    mouseDirectionFromPlayer = inputManager.MouseWorldPosition - (Vector2)playerTransform.position;
-    mouseDirectionFromPlayer.Normalize();
-
     float mouseAngle = Mathf.Atan2(
-      mouseDirectionFromPlayer.y,
-      mouseDirectionFromPlayer.x
+      inputManager.MouseToPlayerPosition.y,
+      inputManager.MouseToPlayerPosition.x
     ) * Mathf.Rad2Deg;
 
     Quaternion mouseDirection = Quaternion.AngleAxis(mouseAngle - 90, Vector3.forward);
 
-    playerTransform.rotation = Quaternion.Lerp(
-      playerTransform.rotation,
-      mouseDirection,
-      ship.EngineTurnSpeed * Time.deltaTime
-    );
+    if (!lerpRotation) {
+      playerTransform.rotation = mouseDirection;
+    } else {
+      playerTransform.rotation = Quaternion.Lerp(
+        playerTransform.rotation,
+        mouseDirection,
+        ship.EngineTurnSpeed * Time.deltaTime
+      );
+    }
   }
 
   private void Move(ControlScheme currentControlScheme)

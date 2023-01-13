@@ -176,7 +176,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   character: {fileID: -5948852812382342105}
-  cameraObject: {fileID: 8752693268186972622, guid: 60cab6b4363997b44979c808f9a9ed31, type: 3}
+  cameraPrefab: {fileID: 8752693268186972622, guid: 60cab6b4363997b44979c808f9a9ed31, type: 3}
 --- !u!114 &-5948852812382342105
 MonoBehaviour:
   m_ObjectHideFlags: 0
