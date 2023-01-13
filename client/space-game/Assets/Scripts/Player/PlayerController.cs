@@ -51,8 +51,7 @@ public class PlayerController : NetworkBehaviour
 
   private void Start()
   {
-    if (!isLocalPlayer)
-    {
+    if (!isLocalPlayer) {
       cameraManager.SetEnabled(false);
       return;
     }
