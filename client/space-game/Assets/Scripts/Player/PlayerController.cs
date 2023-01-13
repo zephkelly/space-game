@@ -31,12 +31,26 @@ public class PlayerController : NetworkBehaviour
     playerRigid2D = GetComponent<Rigidbody2D>();
     playerTransform = GetComponent<Transform>();
 
+    //Here we would instead inject the player stats from the server
     character.Ship = new Ship(ShipClass.Scout, ShipEngine.Ion, ShipPrimaryWeapon.Laser, ShipSecondaryWeapon.None, ShipSpecialWeapon.None);
     ship = character.Ship;
+  }
 
+  private void Start()
+  {
+    if (!isLocalPlayer) {
+      return;
+    }
+    
     inputManager = new InputManager();
     controlScheme = ControlScheme.RelativeToCamera;
 
+    playerRigid2D.centerOfMass = Vector2.zero;
+    CreateCamera();
+  }
+
+  public void CreateCamera()
+  {
     Vector3 cameraSpawnPos = new Vector3(playerTransform.position.x, playerTransform.position.y, -10f);
 
     cameraManager = new CameraManager(
@@ -44,16 +58,6 @@ public class PlayerController : NetworkBehaviour
       playerTransform,
       inputManager
     );
-  }
-
-  private void Start()
-  {
-    if (!isLocalPlayer) {
-      cameraManager.SetEnabled(false);
-      return;
-    }
-
-    playerRigid2D.centerOfMass = Vector2.zero;
   }
 
   private void Update()
@@ -78,9 +82,11 @@ public class PlayerController : NetworkBehaviour
 
   private void LookAtMouse(bool lerpRotation = false)
   {
+    Vector3 mousePosition = inputManager.MouseToPlayerPosition.normalized;
+
     float mouseAngle = Mathf.Atan2(
-      inputManager.MouseToPlayerPosition.y,
-      inputManager.MouseToPlayerPosition.x
+      mousePosition.y,
+      mousePosition.x
     ) * Mathf.Rad2Deg;
 
     Quaternion mouseDirection = Quaternion.AngleAxis(mouseAngle - 90, Vector3.forward);
@@ -117,7 +123,7 @@ public class PlayerController : NetworkBehaviour
         playerRigid2D.AddForce(inputNormalised * ship.EngineSpeed, ForceMode2D.Force);
       } else {
 
-        playerRigid2D.AddForce(inputNormalised * 20, ForceMode2D.Force);
+        playerRigid2D.AddForce(inputNormalised * 60, ForceMode2D.Force);
       }
     }
 
@@ -130,7 +136,7 @@ public class PlayerController : NetworkBehaviour
         playerRigid2D.AddForce(playerTransform.up * ship.EngineSpeed, ForceMode2D.Force);
       } else {
 
-        playerRigid2D.AddForce(playerTransform.up * 20, ForceMode2D.Force);
+        playerRigid2D.AddForce(playerTransform.up * 60, ForceMode2D.Force);
       }
     }
   }

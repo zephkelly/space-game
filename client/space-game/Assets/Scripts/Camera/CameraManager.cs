@@ -1,4 +1,5 @@
 using UnityEngine;
+using Mirror;
 
 public class CameraManager
 {
@@ -9,7 +10,7 @@ public class CameraManager
   private InputManager inputManager;
 
   private Vector3 cameraFollowOffset = new Vector3(0f, 0f, -10f);
-  private float mouseInterpolateDistance = 1f;
+  private float mouseInterpolateDistance = 0.2f;
   private float cameraPanSpeed = 0.125f;
 
   public CameraManager(GameObject _cameraObject, Transform _playerTransform, InputManager _inputManager)
@@ -21,11 +22,6 @@ public class CameraManager
     inputManager = _inputManager;
   }
 
-  public void SetEnabled(bool _enabled)
-  {
-    camera.enabled = _enabled;
-  }
-
   public void SetCameraPosition(Vector3 _position)
   {
     cameraTransform.position = _position;
@@ -34,8 +30,6 @@ public class CameraManager
   public void FollowPlayer()
   {
     if (playerTransform == null) return;
-
-    Debug.Log("FollowPlayer() called");
 
     Vector3 cameraOffset = playerTransform.position + cameraFollowOffset;
     Vector3 cameraFollowMouseOffset = cameraOffset + (Vector3)(inputManager.MouseToPlayerPosition * mouseInterpolateDistance);

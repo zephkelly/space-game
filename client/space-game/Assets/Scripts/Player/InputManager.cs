@@ -19,7 +19,7 @@ public class InputManager
     InputAxisY = Input.GetAxis("Vertical");
 
     MouseWorldPosition = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    MouseToPlayerPosition = (MouseWorldPosition - _playerPosition).normalized;
+    MouseToPlayerPosition = (MouseWorldPosition - _playerPosition);
 
     GetShift = Input.GetKey(KeyCode.LeftShift);
   }
