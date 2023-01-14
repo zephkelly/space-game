@@ -3,9 +3,10 @@ using Mirror;
 
 public class CameraManager
 {
+  private Camera camera;
   private GameObject cameraObject;
   private Transform cameraTransform;
-  private Camera camera;
+
   private Transform playerTransform;
   private InputManager inputManager;
 
@@ -13,18 +14,27 @@ public class CameraManager
   private float mouseInterpolateDistance = 0.2f;
   private float cameraPanSpeed = 0.125f;
 
-  public CameraManager(GameObject _cameraObject, Transform _playerTransform, InputManager _inputManager)
+  [SerializeField] ParallaxController[] starfieldsLayers;
+
+  public CameraManager(GameObject _cameraObject, GameObject _parallaxStarfieldObject, Transform _playerTransform, InputManager _inputManager)
   {
     cameraObject = _cameraObject;
     cameraTransform = cameraObject.GetComponent<Transform>();
     camera = cameraObject.GetComponent<Camera>();
     playerTransform = _playerTransform;
     inputManager = _inputManager;
+
+    starfieldsLayers = _parallaxStarfieldObject.GetComponentsInChildren<ParallaxController>();
   }
 
   public void SetCameraPosition(Vector3 _position)
   {
     cameraTransform.position = _position;
+  }
+
+  public void SetNewPlayerTransform(Transform _playerTransform)
+  {
+    playerTransform = _playerTransform;
   }
 
   public void FollowPlayer()
@@ -36,5 +46,16 @@ public class CameraManager
 
     Vector3 cameraLastPosition = cameraTransform.position;
     cameraTransform.position = Vector3.Lerp(cameraTransform.position, cameraFollowMouseOffset, cameraPanSpeed);
+
+    UpdateParllaxing(cameraLastPosition);
+  }
+
+  private void UpdateParllaxing(Vector2 cameraLastPosition)
+  {
+    //Starfields
+    for (int i = 0; i < starfieldsLayers.Length; i++)
+    {
+      starfieldsLayers[i].Parallax(cameraLastPosition);
+    }
   }
 }

@@ -88,7 +88,7 @@ public class Ship
     switch (ShipEngine)
     {
       case ShipEngine.Ion:
-        EngineSpeed = 100;
+        EngineSpeed = 200;
         EngineAcceleration = 100;
         EngineTurnSpeed = 5;
         break;

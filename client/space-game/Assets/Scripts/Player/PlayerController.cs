@@ -20,6 +20,9 @@ public class PlayerController : NetworkBehaviour
   private CameraManager cameraManager;
 
   [SerializeField]
+  private GameObject parallaxingStarfieldPrefab;
+
+  [SerializeField]
   private GameObject primaryWeaponObject;
   [SerializeField]
   private ParticleSystem primaryWeaponParticleSystem;
@@ -72,6 +75,7 @@ public class PlayerController : NetworkBehaviour
 
     cameraManager = new CameraManager(
       Instantiate(cameraPrefab, cameraSpawnPos, Quaternion.identity),
+      Instantiate(parallaxingStarfieldPrefab, Vector3.zero, Quaternion.identity),
       playerTransform,
       inputManager
     );
