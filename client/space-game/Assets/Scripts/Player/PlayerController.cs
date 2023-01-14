@@ -14,9 +14,15 @@ public class PlayerController : NetworkBehaviour
   private Ship ship;
   private InputManager inputManager;
   private ControlScheme controlScheme;
+
   [SerializeField]
   private GameObject cameraPrefab;
   private CameraManager cameraManager;
+
+  [SerializeField]
+  private GameObject primaryWeaponObject;
+  [SerializeField]
+  private ParticleSystem primaryWeaponParticleSystem;
 
   private Rigidbody2D playerRigid2D;
   private Transform playerTransform;
@@ -38,8 +44,19 @@ public class PlayerController : NetworkBehaviour
 
   private void Start()
   {
+    var primaryWeaponCollision = primaryWeaponParticleSystem.collision;
+
     if (!isLocalPlayer) {
+      gameObject.layer = LayerMask.NameToLayer("Enemy");
+      gameObject.tag = "Enemy";
+      primaryWeaponObject.tag = "Enemy";
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
       return;
+    } else {
+      gameObject.layer = LayerMask.NameToLayer("Player");
+      gameObject.tag = "Player";
+      primaryWeaponObject.tag = "Player";
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Enemy");
     }
     
     inputManager = new InputManager();
@@ -139,5 +156,33 @@ public class PlayerController : NetworkBehaviour
         playerRigid2D.AddForce(playerTransform.up * 60, ForceMode2D.Force);
       }
     }
+  }
+
+  private void OnParticleCollision(GameObject hitObject)
+  {
+    if (hitObject.tag == "Enemy") {
+      Debug.Log("Hit enemy");
+
+      TakeDamage(10);   
+    }
+  }
+
+  private void TakeDamage(int damage)
+  {
+    character.TakeDamage(damage);
+
+    Debug.Log("Taken damage");
+    Debug.Log("Current Health: " + character.Ship.Health);
+
+    if (isServer) TargetTakeDamage(connectionToServer, damage);
+  }
+
+  [TargetRpc]
+  private void TargetTakeDamage(NetworkConnection target, int damage)
+  {
+    character.TakeDamage(damage);
+
+    Debug.Log("Taken damage");
+    Debug.Log("Current Health: " + character.Ship.Health);
   }
 }

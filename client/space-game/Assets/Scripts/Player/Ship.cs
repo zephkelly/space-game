@@ -83,6 +83,8 @@ public class Ship
   {
     ShipEngine = _shipEngine;
 
+    Health = 100;
+
     switch (ShipEngine)
     {
       case ShipEngine.Ion:
