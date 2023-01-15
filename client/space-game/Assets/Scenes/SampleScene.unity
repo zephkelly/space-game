@@ -222,7 +222,9 @@ MonoBehaviour:
   maxConnections: 100
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 3375560761336150188, guid: dc791971b4bf08c4294a35ee123dc391, type: 3}
-  autoCreatePlayer: 1
+  autoCreatePlayer: 0
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 3082002231602407855, guid: 496ae5a46b26ffc409c9c36e31ffea3e, type: 3}
   timeInterpolationGui: 0
+  worldManagerPrefab: {fileID: 3082002231602407855, guid: 496ae5a46b26ffc409c9c36e31ffea3e, type: 3}
