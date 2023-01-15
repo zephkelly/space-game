@@ -32,10 +32,14 @@ public class PlayerFire : NetworkBehaviour
   [Command]
   private void CmdFire()
   {
-    weaponParticleFire.Shoot();
+    //Check if we are self-hosting
+    if (isServer && !isClient) {
+      weaponParticleFire.Shoot();
+    }
+      
     RpcFire();
   }
-
+  
   [ClientRpc(includeOwner = false)]
   private void RpcFire()
   {

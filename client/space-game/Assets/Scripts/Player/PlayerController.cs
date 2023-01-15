@@ -165,9 +165,9 @@ public class PlayerController : NetworkBehaviour
   private void OnParticleCollision(GameObject hitObject)
   {
     if (hitObject.tag == "Enemy") {
-      Debug.Log("Hit enemy");
-
       TakeDamage(10);   
+    } else {
+      Debug.Log("We hit an enemy!");
     }
   }
 
@@ -175,18 +175,22 @@ public class PlayerController : NetworkBehaviour
   {
     character.TakeDamage(damage);
 
-    Debug.Log("Taken damage");
     Debug.Log("Current Health: " + character.Ship.Health);
 
-    if (isServer) TargetTakeDamage(connectionToServer, damage);
+  /*
+    if (isServer && !isLocalPlayer) 
+    {
+      TargetTakeDamage(connectionToServer, damage);
+    }
+    */
   }
+
 
   [TargetRpc]
   private void TargetTakeDamage(NetworkConnection target, int damage)
   {
     character.TakeDamage(damage);
 
-    Debug.Log("Taken damage");
-    Debug.Log("Current Health: " + character.Ship.Health);
+    Debug.Log("RPC Health: " + character.Ship.Health);
   }
 }

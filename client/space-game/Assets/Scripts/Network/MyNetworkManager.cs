@@ -63,7 +63,12 @@ public class MyNetworkManager : NetworkManager
 
     RemoveCamera();
     RemovePlayer();
-    RemoveWorldManager();
+
+    //Check if we are the host
+    if (!NetworkServer.active) 
+    {
+      RemoveWorldManager();
+    }
   }
 
   private void RemoveCamera()
@@ -72,7 +77,6 @@ public class MyNetworkManager : NetworkManager
     GameObject.Destroy(clientCamera);
   }
 
-  [Client]
   private void RemoveWorldManager()
   {
     if (worldManagerObject == null) return;
