@@ -49,17 +49,35 @@ public class PlayerController : NetworkBehaviour
   {
     var primaryWeaponCollision = primaryWeaponParticleSystem.collision;
 
-    if (!isLocalPlayer) {
+    if (isClient && !isLocalPlayer)
+    {
       gameObject.layer = LayerMask.NameToLayer("Enemy");
       gameObject.tag = "Enemy";
       primaryWeaponObject.tag = "Enemy";
-      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Enemy");
       return;
-    } else {
+    }
+    else if (isClient && isLocalPlayer)
+    {
       gameObject.layer = LayerMask.NameToLayer("Player");
       gameObject.tag = "Player";
       primaryWeaponObject.tag = "Player";
       primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Enemy");
+    }
+    else if (isServer && !isLocalPlayer)
+    {
+      gameObject.layer = LayerMask.NameToLayer("Player");
+      gameObject.tag = "Player";
+      primaryWeaponObject.tag = "Player";
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
+      return;
+    }
+    else
+    {
+      gameObject.layer = LayerMask.NameToLayer("Player");
+      gameObject.tag = "Player";
+      primaryWeaponObject.tag = "Player";
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
     }
     
     inputManager = new InputManager();
@@ -162,35 +180,82 @@ public class PlayerController : NetworkBehaviour
     }
   }
 
+
+  private bool collisionLocalhost = false;
   private void OnParticleCollision(GameObject hitObject)
   {
-    if (hitObject.tag == "Enemy") {
-      TakeDamage(10);   
-    } else {
-      Debug.Log("We hit an enemy!");
+    if (isServer && isLocalPlayer)
+    { 
+      //Prevent double registering of collisions for self hosted server + client
+      if (!collisionLocalhost) {
+        collisionLocalhost = true;
+        return;
+      }
+
+      if (hitObject.tag == "Enemy") {
+        //Update health on server
+        TakeDamage(10);
+
+        //Upate health on client
+        TargetTakeDamage(hitObject.GetComponentInParent<PlayerController>().connectionToClient, 10);
+        
+        collisionLocalhost = false;
+      }
+    }
+    else if (isServer && !isLocalPlayer)
+    {
+      if (hitObject.tag == "Player") {
+        //Update health on server
+        TakeDamage(10);
+
+        //Upate health on client
+        //Change whether on local client or remote client
+        if (hitObject.GetComponentInParent<PlayerController>().isLocalPlayer)
+        {
+          Debug.Log("Local client");
+          TargetTakeDamage(this.connectionToClient, 10);
+        } else {
+          Debug.Log("Remote client");
+          TargetTakeDamage(hitObject.GetComponentInParent<PlayerController>().connectionToClient, 10);
+          TargetTakeDamage(this.connectionToClient, 10);
+        }
+      }
+      else if (hitObject.tag == "Enemy")
+      {
+        TakeDamage(10);
+        
+        TargetTakeDamage(this.connectionToClient, 10);
+        TargetTakeDamage(hitObject.GetComponentInParent<PlayerController>().connectionToClient, 10);
+      }
+    }
+    else  //Local client interactions
+    {
+      if (isLocalPlayer)
+      {
+        if (hitObject.tag == "Enemy") {
+
+        }
+      }
+      else {
+        if (hitObject.tag == "Player") {
+          
+        }
+      }
     }
   }
 
   private void TakeDamage(int damage)
-  {
+  { 
+    Debug.Log(character.gameObject.name + " took " + damage + " damage");
+
     character.TakeDamage(damage);
-
-    Debug.Log("Current Health: " + character.Ship.Health);
-
-  /*
-    if (isServer && !isLocalPlayer) 
-    {
-      TargetTakeDamage(connectionToServer, damage);
-    }
-    */
   }
 
-
   [TargetRpc]
-  private void TargetTakeDamage(NetworkConnection target, int damage)
+  private void TargetTakeDamage(NetworkConnection conn, int damage)
   {
-    character.TakeDamage(damage);
+    Debug.Log(character.gameObject.tag + " took " + damage + " damage through RPC");
 
-    Debug.Log("RPC Health: " + character.Ship.Health);
+    character.TakeDamage(damage);
   }
 }

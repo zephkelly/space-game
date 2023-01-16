@@ -47,6 +47,7 @@ public class CameraManager
     Vector3 cameraLastPosition = cameraTransform.position;
     cameraTransform.position = Vector3.Lerp(cameraTransform.position, cameraFollowMouseOffset, cameraPanSpeed);
 
+    if (cameraLastPosition == null) return;
     UpdateParllaxing(cameraLastPosition);
   }
 
