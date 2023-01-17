@@ -53,13 +53,13 @@ public class ChunkGenerator
       lazyGridKey.y++;
       lazyGridKey.x -= 7;
     }
-
-    Debug.Log("Total chunks: " + worldManager.AllChunks.Count);
   }
 
   public void SetActiveChunks(Vector2Int chunkCenter, GameObject player)
   {
     Vector2Int activeGridKey = new Vector2Int(chunkCenter.x - 1, chunkCenter.y - 1);
+
+    worldManager.chunksPackage.Clear();
 
     for (int y = 0; y < 3; y++)
     {
@@ -72,7 +72,7 @@ public class ChunkGenerator
           worldManager.LazyChunks.Remove(activeGridKey);
           worldManager.ActiveChunks.Add(lazyChunk.Key, lazyChunk);
 
-          worldManager.TargetGetChunkFromServer(player.GetComponent<NetworkIdentity>().connectionToClient, lazyChunk.Key);
+          worldManager.chunksPackage.Add(lazyChunk.Key);
         }
         else
         {
@@ -85,6 +85,8 @@ public class ChunkGenerator
       activeGridKey.y++;
       activeGridKey.x -= 3;
     }
+
+    worldManager.PrepareActiveChunksPackage(player.GetComponent<NetworkIdentity>().connectionToClient);
   }
 
   public void DeactivateActiveChunks()

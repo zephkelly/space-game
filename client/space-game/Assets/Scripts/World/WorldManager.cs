@@ -49,95 +49,7 @@ public class WorldManager : NetworkBehaviour
       GenerateInitialChunks();
     }
   }
-
-  private void FixedUpdate()
-  {
-    FetchChunkPositions();
-  }
-
-  private void FetchChunkPositions()
-  {
-    if (chunkFetchTimer > 0) {
-      chunkFetchTimer -= Time.fixedDeltaTime;
-      return;
-    }
-
-    chunkFetchTimer = fetchInterval;
-
-    //If we are purely a server
-    if (clientPlayer == null)
-    {
-      if (players.Count <= 0) return;
-      GetPlayerChunkPositions();
-      return;
-    }
-    
-    //If we are a host
-    if (clientPlayer != null && isServer)
-    {
-      if (players.Count <= 0) return;
-
-      GetPlayerChunkPositions();
-      return;
-    }
-
-    //If we are a client
-    GetClientChunkPosition();
-  }
-
-  [TargetRpc]
-  public void TargetGetChunkFromServer(NetworkConnection target, Vector2Int chunkName)
-  {
-    if (target.identity.isLocalPlayer) {
-      Debug.Log("We are hosting!");
-    }
-    Debug.Log("Spawning " + chunkName);
-  }
-
-  [Client]
-  private void GetClientChunkPosition()
-  {
-    Vector2Int chunkPosition = chunkGenerator.GetChunkPosition(clientPlayer.position);
-
-    if (playerChunkPositions[clientPlayer] == chunkPosition) return;
-
-    playerChunkPositions[clientPlayer] = chunkPosition;
-  }
   
-  [Server]
-  private void GetPlayerChunkPositions()
-  {
-    for (int i = 0; i < players.Count; i++)
-    {
-      Vector2Int chunkPosition = chunkGenerator.GetChunkPosition(players[i].position);
-
-      if (playerChunkPositions[players[i]] == chunkPosition) continue;
-
-      playerChunkPositions[players[i]] = chunkPosition;
-
-      chunkGenerator.DeactivateActiveChunks();
-      chunkGenerator.GenerateChunks(chunkPosition);
-
-      chunkGenerator.SetActiveChunks(chunkPosition, players[i].gameObject);
-    }
-  }
-
-  [Server]
-  private void GenerateInitialChunks()
-  {
-    chunkGenerator.GenerateChunks(Vector2Int.zero);
-  }
- 
-  [Client]
-  public void AddClientPlayer(Transform player) 
-  {
-    clientPlayer = player;
-    clientNetIdentity = clientPlayer.GetComponent<NetworkIdentity>();
-
-    if (playerChunkPositions.ContainsKey(clientPlayer)) return;
-    playerChunkPositions.Add(clientPlayer, Vector2Int.zero);
-  }
-
   [Server]
   public void AddPlayer(Transform player)
   {
@@ -155,5 +67,109 @@ public class WorldManager : NetworkBehaviour
     if (playerChunkPositions.ContainsKey(player)) {
       playerChunkPositions.Remove(player);
     }
+  }
+
+  [Server]
+  private void GenerateInitialChunks()
+  {
+    chunkGenerator.GenerateChunks(Vector2Int.zero);
+  }
+  
+
+  private void FixedUpdate()
+  {
+    FetchChunkPositions();
+  }
+
+  private void FetchChunkPositions()
+  {
+    if (chunkFetchTimer > 0) {
+      chunkFetchTimer -= Time.fixedDeltaTime;
+      return;
+    }
+
+    chunkFetchTimer = fetchInterval;
+
+    //If we are purely a server
+    if (clientPlayer == null) {
+      if (players.Count <= 0) return;
+      GeneratePlayerChunks();
+      return;
+    }
+    
+    //If we are a host
+    if (clientPlayer != null && isServer) {
+      if (players.Count <= 0) return;
+
+      GeneratePlayerChunks();
+      return;
+    }
+
+    //If we are a client
+    GetClientChunkPosition();
+  }
+
+  [Server]
+  private void GeneratePlayerChunks()
+  {
+    for (int i = 0; i < players.Count; i++)
+    {
+      Vector2Int chunkPosition = chunkGenerator.GetChunkPosition(players[i].position);
+
+      if (playerChunkPositions[players[i]] == chunkPosition) continue;
+
+      playerChunkPositions[players[i]] = chunkPosition;
+
+      chunkGenerator.DeactivateActiveChunks();
+      chunkGenerator.GenerateChunks(chunkPosition);
+
+      chunkGenerator.SetActiveChunks(chunkPosition, players[i].gameObject);
+    }
+  }
+
+  public List<Vector2Int> chunksPackage = new List<Vector2Int>();
+
+  [Server]
+  public void PrepareActiveChunksPackage(NetworkConnection target)
+  {
+    //Create bundled package
+    Vector2Int[] activeChunksBundle = new Vector2Int[chunksPackage.Count];
+
+    for (int i = 0; i < activeChunksBundle.Length; i++) {
+      activeChunksBundle[i] = chunksPackage[i];
+    }
+
+    TargetSendActiveChunksPackage(target, activeChunksBundle);
+  }
+
+  [TargetRpc]
+  public void TargetSendActiveChunksPackage(NetworkConnection target, Vector2Int[] chunkPackage)
+  {
+    if (target.identity.isClient && isServer) {
+      Debug.Log("We are hosting!");
+      return;
+    }
+    
+    Debug.Log("Spawning " + chunkPackage.Length + " chunks");
+  }
+
+  [Client]
+  private void GetClientChunkPosition()
+  {
+    Vector2Int chunkPosition = chunkGenerator.GetChunkPosition(clientPlayer.position);
+
+    if (playerChunkPositions[clientPlayer] == chunkPosition) return;
+
+    playerChunkPositions[clientPlayer] = chunkPosition;
+  }
+ 
+  [Client]
+  public void AddClientPlayer(Transform player) 
+  {
+    clientPlayer = player;
+    clientNetIdentity = clientPlayer.GetComponent<NetworkIdentity>();
+
+    if (playerChunkPositions.ContainsKey(clientPlayer)) return;
+    playerChunkPositions.Add(clientPlayer, Vector2Int.zero);
   }
 }
