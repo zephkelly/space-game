@@ -63,6 +63,9 @@ public class PlayerController : NetworkBehaviour
       gameObject.tag = "Player";
       primaryWeaponObject.tag = "Player";
       primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Enemy");
+
+      // Add the local player to the world manager
+      AddClientPlayerToWorldManager();
     }
     else if (isServer && !isLocalPlayer)
     {
@@ -85,6 +88,11 @@ public class PlayerController : NetworkBehaviour
 
     playerRigid2D.centerOfMass = Vector2.zero;
     CreateCamera();
+  }
+
+  private void AddClientPlayerToWorldManager()
+  {
+    GameObject.FindGameObjectWithTag("WorldManager").GetComponent<WorldManager>().AddClientPlayer(playerTransform);
   }
 
   public void CreateCamera()

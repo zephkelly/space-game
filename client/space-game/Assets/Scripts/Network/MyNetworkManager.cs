@@ -5,15 +5,12 @@ using Mirror;
 
 public class MyNetworkManager : NetworkManager
 {
-  public static new MyNetworkManager singleton { get; private set; }
+  public new MyNetworkManager singleton { get; private set; }
   
   [SerializeField]
   private GameObject worldManagerPrefab;
   private GameObject worldManagerObject;
   private WorldManager worldManager;
-
-  [SerializeField]
-  private Dictionary<NetworkConnectionToClient, GameObject> players;
 
   //Server ---------------------------------------------------------------
   /// Called on the server when a new client connects.
@@ -21,18 +18,19 @@ public class MyNetworkManager : NetworkManager
   {
     base.OnServerConnect(conn);
 
-    if (worldManagerObject != null) return;
-
-    worldManagerObject = GameObject.Instantiate(worldManagerPrefab);
-    NetworkServer.Spawn(worldManagerObject);
-
-    worldManager = worldManagerObject.GetComponent<WorldManager>();
+    if (worldManagerObject == null) {
+      worldManagerObject = GameObject.Instantiate(worldManagerPrefab);
+      NetworkServer.Spawn(worldManagerObject);
+      worldManager = worldManagerObject.GetComponent<WorldManager>();
+    }
   }
 
   /// Called on the server when a client is ready.
   public override void OnServerReady(NetworkConnectionToClient conn)
   {
-    base.OnServerReady(conn);
+    //base.OnServerReady(conn);
+
+    NetworkServer.SetClientReady(conn);
 
     if (conn.isReady) {
       OnServerAddPlayer(conn);
@@ -42,12 +40,17 @@ public class MyNetworkManager : NetworkManager
   public override void OnServerAddPlayer(NetworkConnectionToClient conn)
   {
     GameObject newPlayer = Object.Instantiate(playerPrefab);
+
     NetworkServer.AddPlayerForConnection(conn, newPlayer);
     newPlayer.name = "Player: " + conn.identity.netId;
+
+    worldManager.AddPlayer(newPlayer.transform);
   }
 
   public override void OnServerDisconnect(NetworkConnectionToClient conn)
   {
+    worldManager.RemovePlayer(conn.identity.gameObject.transform);
+    
     base.OnServerDisconnect(conn);
   }
 

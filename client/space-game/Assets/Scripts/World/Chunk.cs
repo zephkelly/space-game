@@ -1,15 +1,19 @@
 using UnityEngine;
+using Mirror;
 
 public class Chunk
 {
-  int keyX;
-  int keyY;
+  [SyncVar]
+  public Vector2Int Key;
 
-  public Vector2 Key => new Vector2(keyX, keyY);
+  [SyncVar]
+  int diameter;
 
-  public Chunk(int keyX, int keyY)
+  public Chunk() { }
+
+  public Chunk(Vector2Int _key, int _diameter)
   {
-    this.keyX = keyX;
-    this.keyY = keyY;
+    Key = _key;
+    diameter = _diameter;
   }
 }

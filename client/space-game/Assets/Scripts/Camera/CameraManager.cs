@@ -48,10 +48,10 @@ public class CameraManager
     cameraTransform.position = Vector3.Lerp(cameraTransform.position, cameraFollowMouseOffset, cameraPanSpeed);
 
     if (cameraLastPosition == null) return;
-    UpdateParllaxing(cameraLastPosition);
+    UpdateParallaxing(cameraLastPosition);
   }
 
-  private void UpdateParllaxing(Vector2 cameraLastPosition)
+  private void UpdateParallaxing(Vector2 cameraLastPosition)
   {
     //Starfields
     for (int i = 0; i < starfieldsLayers.Length; i++)

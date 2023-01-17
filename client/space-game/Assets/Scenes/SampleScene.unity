@@ -133,8 +133,8 @@ GameObject:
   m_Component:
   - component: {fileID: 61923852}
   - component: {fileID: 61923855}
-  - component: {fileID: 61923853}
   - component: {fileID: 61923854}
+  - component: {fileID: 61923856}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -157,33 +157,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &61923853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 61923849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Port: 7777
-  DualMode: 1
-  NoDelay: 1
-  Interval: 10
-  Timeout: 10000
-  FastResend: 2
-  SendWindowSize: 4096
-  ReceiveWindowSize: 4096
-  MaxRetransmit: 40
-  MaximizeSocketBuffers: 1
-  ReliableMaxMessageSize: 298449
-  UnreliableMaxMessageSize: 1199
-  debugLog: 0
-  statisticsGUI: 0
-  statisticsLog: 0
 --- !u!114 &61923854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +190,7 @@ MonoBehaviour:
   sendRate: 60
   offlineScene: 
   onlineScene: 
-  transport: {fileID: 61923853}
+  transport: {fileID: 61923856}
   networkAddress: localhost
   maxConnections: 8
   authenticator: {fileID: 0}
@@ -228,3 +201,30 @@ MonoBehaviour:
   - {fileID: 3082002231602407855, guid: 496ae5a46b26ffc409c9c36e31ffea3e, type: 3}
   timeInterpolationGui: 0
   worldManagerPrefab: {fileID: 3082002231602407855, guid: 496ae5a46b26ffc409c9c36e31ffea3e, type: 3}
+--- !u!114 &61923856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61923849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Port: 7777
+  DualMode: 1
+  NoDelay: 1
+  Interval: 10
+  Timeout: 10000
+  FastResend: 2
+  SendWindowSize: 4096
+  ReceiveWindowSize: 4096
+  MaxRetransmit: 40
+  MaximizeSocketBuffers: 1
+  ReliableMaxMessageSize: 298449
+  UnreliableMaxMessageSize: 1199
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0

@@ -73,7 +73,7 @@ public class ParallaxController : MonoBehaviour
         parallaxFactor * Time.deltaTime
       );
 
-      if (starfieldParticleSystem == null) return;
+      if (stars == null || starfieldParticleSystem == null) return;
       starfieldParticleSystem.SetParticles(stars, stars.Length);
     }
   
