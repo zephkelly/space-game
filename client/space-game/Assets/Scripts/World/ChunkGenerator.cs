@@ -36,7 +36,7 @@ public class ChunkGenerator
         }
         else
         {
-          GameObject newChunk = new GameObject("Chunk: " + CHUNK_NUMBER + " (" + lazyGridKey + ")");
+          GameObject newChunk = new GameObject("Chunk: " + CHUNK_NUMBER + " " + lazyGridKey);
           newChunk.transform.parent = worldManager.transform;
           newChunk.SetActive(false);
 
@@ -73,6 +73,10 @@ public class ChunkGenerator
           worldManager.ActiveChunks.Add(lazyChunk.Key, lazyChunk);
 
           worldManager.chunksPackage.Add(lazyChunk.Key);
+        }
+        else if (worldManager.ActiveChunks.ContainsKey(activeGridKey))
+        {
+          worldManager.chunksPackage.Add(activeGridKey);
         }
         else
         {

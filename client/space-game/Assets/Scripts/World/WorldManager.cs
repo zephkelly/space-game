@@ -55,8 +55,10 @@ public class WorldManager : NetworkBehaviour
   {
     players.Add(player);
 
-    if (playerChunkPositions.ContainsKey(player)) return;
     playerChunkPositions.Add(player, Vector2Int.zero);
+
+    lastChunkPackages.Add(player.GetComponent<NetworkIdentity>().connectionToClient, new List<Vector2Int>());
+    chunkGenerator.SetActiveChunks(Vector2Int.zero, player.gameObject);
   }
 
   [Server]
@@ -64,9 +66,7 @@ public class WorldManager : NetworkBehaviour
   {
     players.Remove(player);
 
-    if (playerChunkPositions.ContainsKey(player)) {
-      playerChunkPositions.Remove(player);
-    }
+    playerChunkPositions.Remove(player);
   }
 
   [Server]
@@ -128,31 +128,42 @@ public class WorldManager : NetworkBehaviour
   }
 
   public List<Vector2Int> chunksPackage = new List<Vector2Int>();
-  private List<Vector2Int> lastChunkPackage = new List<Vector2Int>();
+
+  private Dictionary<NetworkConnection, List<Vector2Int>> lastChunkPackages = new Dictionary<NetworkConnection, List<Vector2Int>>();
 
   [Server]
   public void PrepareActiveChunksPackage(NetworkConnection target)
   {
+    //Find identical chunks -------------------------------------
     var deltaChunks = new List<Vector2Int>();
 
-    //Find identical chunks
-    foreach (var chunk in chunksPackage) {
-      if (lastChunkPackage.Contains(chunk)) continue;
+    foreach (var chunk in chunksPackage) 
+    {
+      if (lastChunkPackages[target].Contains(chunk)) continue;
 
       deltaChunks.Add(chunk);
     }
 
-    lastChunkPackage.Clear();
-
-    // Bundle package
+    // Bundle package -------------------------------------------
     Vector2Int[] activeChunksBundle = new Vector2Int[deltaChunks.Count];
 
     for (int i = 0; i < activeChunksBundle.Length; i++) {
       activeChunksBundle[i] = deltaChunks[i];
     }
 
+    //Send package to client ------------------------------------
     TargetSendActiveChunksPackage(target, activeChunksBundle);
-    chunksPackage.CopyTo(lastChunkPackage);
+
+    //Update last package dictionary ----------------------------
+    if (lastChunkPackages.ContainsKey(target)) 
+    {
+      lastChunkPackages[target].Clear();
+      chunksPackage.CopyTo(lastChunkPackages[target]);
+    } 
+    else {
+      lastChunkPackages.Add(target, chunksPackage);
+    }
+
     chunksPackage.Clear();
   }
 
@@ -161,6 +172,7 @@ public class WorldManager : NetworkBehaviour
   {
     if (target.identity.isClient && isServer) {
       Debug.Log("We are hosting!");
+      Debug.Log("Spawning " + chunkPackage.Length + " chunks");
       return;
     }
     
