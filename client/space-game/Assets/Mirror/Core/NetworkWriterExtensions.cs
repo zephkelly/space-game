@@ -260,7 +260,7 @@ namespace Mirror
 
             // warn if the GameObject doesn't have a NetworkIdentity,
             if (!value.TryGetComponent<NetworkIdentity>(out NetworkIdentity identity))
-                Debug.LogWarning($"NetworkWriter {value} has no NetworkIdentity");
+                //Debug.LogWarning($"NetworkWriter {value} has no NetworkIdentity");
 
             // serialize the correct amount of data in any case to make sure
             // that the other end can read the expected amount of data too.

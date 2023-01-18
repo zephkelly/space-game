@@ -24154,7 +24154,7 @@ MonoBehaviour:
   starSizeMin: 0.04
   starSizeMax: 0.1
   starSpawnRadius: 45
-  parallaxFactor: 34
+  parallaxFactor: 38
 --- !u!1 &4933646382185461187
 GameObject:
   m_ObjectHideFlags: 0
@@ -29023,7 +29023,7 @@ MonoBehaviour:
   starSizeMin: 0.04
   starSizeMax: 0.16
   starSpawnRadius: 45
-  parallaxFactor: 42
+  parallaxFactor: 45
 --- !u!1 &6638215561750267658
 GameObject:
   m_ObjectHideFlags: 0

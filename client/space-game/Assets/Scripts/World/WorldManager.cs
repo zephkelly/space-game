@@ -19,9 +19,9 @@ public class WorldManager : NetworkBehaviour
 
   private Dictionary<Transform, Vector2Int> playerChunkPositions = new Dictionary<Transform, Vector2Int>();
 
-  private readonly SyncDictionary<Vector2Int, Chunk> activeChunks = new SyncDictionary<Vector2Int, Chunk>();
+  private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
 
-  private readonly SyncDictionary<Vector2Int, Chunk> lazyChunks = new SyncDictionary<Vector2Int, Chunk>();
+  private Dictionary<Vector2Int, Chunk> lazyChunks = new Dictionary<Vector2Int, Chunk>();
 
   private Dictionary<Vector2Int, Chunk> inactiveChunks = new Dictionary<Vector2Int, Chunk>();
 
@@ -36,9 +36,9 @@ public class WorldManager : NetworkBehaviour
 
   public Dictionary<Vector2Int, Chunk> InactiveChunks => inactiveChunks;
 
-  public SyncDictionary<Vector2Int, Chunk> ActiveChunks => activeChunks;
+  public Dictionary<Vector2Int, Chunk> ActiveChunks => activeChunks;
 
-  public SyncDictionary<Vector2Int, Chunk> LazyChunks => lazyChunks;
+  public Dictionary<Vector2Int, Chunk> LazyChunks => lazyChunks;
 
   private void Start()
   {
@@ -102,6 +102,7 @@ public class WorldManager : NetworkBehaviour
       if (players.Count <= 0) return;
 
       GeneratePlayerChunks();
+      GetClientChunkPosition();
       return;
     }
 
@@ -152,7 +153,13 @@ public class WorldManager : NetworkBehaviour
     }
 
     //Send package to client ------------------------------------
-    TargetSendActiveChunksPackage(target, activeChunksBundle);
+    if (target.identity != NetworkServer.localConnection.identity) {
+      TargetSendActiveChunksPackage(target, activeChunksBundle);
+    } else {
+      foreach (var chunk in activeChunksBundle) {
+        allChunks[chunk].chunkObject.SetActive(true);
+      }
+    }
 
     //Update last package dictionary ----------------------------
     if (lastChunkPackages.ContainsKey(target)) 
@@ -167,16 +174,20 @@ public class WorldManager : NetworkBehaviour
     chunksPackage.Clear();
   }
 
+  internal int CHUNK_NUMBER;
   [TargetRpc]
   public void TargetSendActiveChunksPackage(NetworkConnection target, Vector2Int[] chunkPackage)
   {
-    if (target.identity.isClient && isServer) {
-      Debug.Log("We are hosting!");
-      Debug.Log("Spawning " + chunkPackage.Length + " chunks");
-      return;
+    foreach (var chunk in chunkPackage) {
+      GameObject newChunk = new GameObject("Chunk: " + CHUNK_NUMBER + " " + chunk);
+      newChunk.transform.parent = this.transform;
+
+      Chunk newChunkInfo = new Chunk(chunk, newChunk);
+      activeChunks.Add(chunk, newChunkInfo);
+      CHUNK_NUMBER++;
     }
-    
-    Debug.Log("Spawning " + chunkPackage.Length + " chunks");
+
+    //Do a check for any chunks now lazy and send a command to the server updating the state of the chunk
   }
 
   [Client]

@@ -32,7 +32,7 @@ public class ChunkGenerator
           Chunk inactiveChunk = worldManager.InactiveChunks[lazyGridKey];
 
           worldManager.InactiveChunks.Remove(lazyGridKey);
-          worldManager.LazyChunks.Add(inactiveChunk.Key, inactiveChunk);
+          worldManager.LazyChunks.Add(inactiveChunk.key, inactiveChunk);
         }
         else
         {
@@ -40,11 +40,11 @@ public class ChunkGenerator
           newChunk.transform.parent = worldManager.transform;
           newChunk.SetActive(false);
 
-          Chunk newChunkInfo = new Chunk(lazyGridKey, CHUNK_DIAMETER);
+          Chunk newChunkInfo = new Chunk(lazyGridKey, newChunk, CHUNK_DIAMETER);
           CHUNK_NUMBER++;
 
-          worldManager.LazyChunks.Add(newChunkInfo.Key, newChunkInfo);
-          worldManager.AllChunks.Add(newChunkInfo.Key, newChunkInfo);      
+          worldManager.LazyChunks.Add(newChunkInfo.key, newChunkInfo);
+          worldManager.AllChunks.Add(newChunkInfo.key, newChunkInfo);      
         }
 
         lazyGridKey.x++;
@@ -70,9 +70,9 @@ public class ChunkGenerator
           Chunk lazyChunk = worldManager.LazyChunks[activeGridKey];
 
           worldManager.LazyChunks.Remove(activeGridKey);
-          worldManager.ActiveChunks.Add(lazyChunk.Key, lazyChunk);
+          worldManager.ActiveChunks.Add(lazyChunk.key, lazyChunk);
 
-          worldManager.chunksPackage.Add(lazyChunk.Key);
+          worldManager.chunksPackage.Add(lazyChunk.key);
         }
         else if (worldManager.ActiveChunks.ContainsKey(activeGridKey))
         {

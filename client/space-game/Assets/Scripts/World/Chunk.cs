@@ -1,19 +1,19 @@
 using UnityEngine;
-using Mirror;
 
 public class Chunk
 {
-  [SyncVar]
-  public Vector2Int Key;
+  public GameObject chunkObject;
 
-  [SyncVar]
+  public Vector2Int key;
+
   int diameter;
 
   public Chunk() { }
 
-  public Chunk(Vector2Int _key, int _diameter)
+  public Chunk(Vector2Int _key, GameObject _chunkObj, int _diameter = 50)
   {
-    Key = _key;
+    key = _key;
+    chunkObject = _chunkObj;
     diameter = _diameter;
   }
 }
