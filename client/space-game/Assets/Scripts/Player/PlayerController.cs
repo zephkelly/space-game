@@ -54,7 +54,7 @@ public class PlayerController : NetworkBehaviour
       gameObject.layer = LayerMask.NameToLayer("Enemy");
       gameObject.tag = "Enemy";
       primaryWeaponObject.tag = "Enemy";
-      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Enemy");
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Enemy") | 1 << LayerMask.NameToLayer("Asteroid");
       return;
     }
     else if (isClient && isLocalPlayer)
@@ -62,7 +62,7 @@ public class PlayerController : NetworkBehaviour
       gameObject.layer = LayerMask.NameToLayer("Player");
       gameObject.tag = "Player";
       primaryWeaponObject.tag = "Player";
-      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Enemy");
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Enemy") | 1 << LayerMask.NameToLayer("Asteroid");
 
       // Add the local player to the world manager
       AddClientPlayerToWorldManager();
@@ -72,7 +72,7 @@ public class PlayerController : NetworkBehaviour
       gameObject.layer = LayerMask.NameToLayer("Player");
       gameObject.tag = "Player";
       primaryWeaponObject.tag = "Player";
-      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Asteroid");
       return;
     }
     else
@@ -80,7 +80,7 @@ public class PlayerController : NetworkBehaviour
       gameObject.layer = LayerMask.NameToLayer("Player");
       gameObject.tag = "Player";
       primaryWeaponObject.tag = "Player";
-      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player");
+      primaryWeaponCollision.collidesWith  = 1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Asteroid");
     }
     
     inputManager = new InputManager();

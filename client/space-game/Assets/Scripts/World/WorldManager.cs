@@ -7,6 +7,7 @@ using Mirror;
 public class WorldManager : NetworkBehaviour
 {
   private static ChunkGenerator chunkGenerator;
+  private static ChunkPopulator chunkPopulator;
 
   [SerializeField]
   private Transform clientPlayer;  //Always active
@@ -14,6 +15,9 @@ public class WorldManager : NetworkBehaviour
 
   [SerializeField]
   private List<Transform> players = new List<Transform>();
+
+  [SerializeField]
+  public GameObject smallAsteroidPrefab;
 
   // Chunks -----------------------------------------------
 
@@ -33,16 +37,14 @@ public class WorldManager : NetworkBehaviour
   // Getters -----------------------------------------------
 
   public Dictionary<Vector2Int, Chunk> AllChunks => allChunks;
-
   public Dictionary<Vector2Int, Chunk> InactiveChunks => inactiveChunks;
-
-  public Dictionary<Vector2Int, Chunk> ActiveChunks => activeChunks;
-
   public Dictionary<Vector2Int, Chunk> LazyChunks => lazyChunks;
+  public Dictionary<Vector2Int, Chunk> ActiveChunks => activeChunks;
 
   private void Start()
   {
-    chunkGenerator = new ChunkGenerator(this);
+    chunkPopulator = new ChunkPopulator(this);
+    chunkGenerator = new ChunkGenerator(this, chunkPopulator);
 
     if (isServer) 
     {
@@ -57,7 +59,6 @@ public class WorldManager : NetworkBehaviour
 
     playerChunkPositions.Add(player, Vector2Int.zero);
 
-    lastChunkPackages.Add(player.GetComponent<NetworkIdentity>().connectionToClient, new List<Vector2Int>());
     chunkGenerator.SetActiveChunks(Vector2Int.zero, player.gameObject);
   }
 
@@ -102,12 +103,12 @@ public class WorldManager : NetworkBehaviour
       if (players.Count <= 0) return;
 
       GeneratePlayerChunks();
-      GetClientChunkPosition();
+      //GetClientChunkPosition();
       return;
     }
 
     //If we are a client
-    GetClientChunkPosition();
+    //GetClientChunkPosition();
   }
 
   [Server]
@@ -128,6 +129,7 @@ public class WorldManager : NetworkBehaviour
     }
   }
 
+  /*
   public List<Vector2Int> chunksPackage = new List<Vector2Int>();
 
   private Dictionary<NetworkConnection, List<Vector2Int>> lastChunkPackages = new Dictionary<NetworkConnection, List<Vector2Int>>();
@@ -183,12 +185,17 @@ public class WorldManager : NetworkBehaviour
       newChunk.transform.parent = this.transform;
 
       Chunk newChunkInfo = new Chunk(chunk, newChunk);
-      activeChunks.Add(chunk, newChunkInfo);
-      CHUNK_NUMBER++;
+
+      //TEMP ---
+      if (!activeChunks.ContainsKey(chunk)){
+        activeChunks.Add(chunk, newChunkInfo);
+        CHUNK_NUMBER++;
+      }
     }
 
     //Do a check for any chunks now lazy and send a command to the server updating the state of the chunk
   }
+  */
 
   [Client]
   private void GetClientChunkPosition()

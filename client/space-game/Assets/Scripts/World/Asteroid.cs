@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class Asteroid
 {
-  int positionX;
-  int positionY;
+  public Vector2 position;
+  public GameObject asteroidObject;
 
-  public Vector2 Position => new Vector2(positionX, positionY);
-
-  public Asteroid(int positionX, int positionY)
+  public Asteroid(Vector2 position, GameObject asteroidObject)
   {
-    this.positionX = positionX;
-    this.positionY = positionY;
+    this.position = position;
+    this.asteroidObject = asteroidObject;
   }
 }

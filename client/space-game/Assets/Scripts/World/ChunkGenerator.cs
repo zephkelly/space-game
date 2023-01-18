@@ -6,16 +6,15 @@ using Mirror;
 public class ChunkGenerator
 {
   private WorldManager worldManager;
+  private ChunkPopulator chunkPopulator;
 
 	private const int CHUNK_DIAMETER = 50;
 	internal int CHUNK_NUMBER;
 
-	private uint seed;
-
-  public ChunkGenerator(WorldManager _worldManager)
+  public ChunkGenerator(WorldManager _worldManager, ChunkPopulator _chunkPopulator)
   {
     worldManager = _worldManager;
-    SetRandomSeed();
+    chunkPopulator = _chunkPopulator;
   }
 
 	 //Add 5x5 to lazy chunks
@@ -36,15 +35,18 @@ public class ChunkGenerator
         }
         else
         {
-          GameObject newChunk = new GameObject("Chunk: " + CHUNK_NUMBER + " " + lazyGridKey);
-          newChunk.transform.parent = worldManager.transform;
-          newChunk.SetActive(false);
-
-          Chunk newChunkInfo = new Chunk(lazyGridKey, newChunk, CHUNK_DIAMETER);
+          GameObject newChunkObject = new GameObject("Chunk: " + CHUNK_NUMBER + " " + lazyGridKey);
+          newChunkObject.transform.parent = worldManager.transform;
+          newChunkObject.SetActive(false);
           CHUNK_NUMBER++;
 
-          worldManager.LazyChunks.Add(newChunkInfo.key, newChunkInfo);
-          worldManager.AllChunks.Add(newChunkInfo.key, newChunkInfo);      
+          Chunk newChunk = new Chunk(lazyGridKey, newChunkObject, CHUNK_DIAMETER);
+          
+
+          chunkPopulator.PopulateChunk(newChunk);
+
+          worldManager.LazyChunks.Add(newChunk.key, newChunk);
+          worldManager.AllChunks.Add(newChunk.key, newChunk); 
         }
 
         lazyGridKey.x++;
@@ -59,8 +61,6 @@ public class ChunkGenerator
   {
     Vector2Int activeGridKey = new Vector2Int(chunkCenter.x - 1, chunkCenter.y - 1);
 
-    worldManager.chunksPackage.Clear();
-
     for (int y = 0; y < 3; y++)
     {
       for (int x = 0; x < 3; x++)
@@ -72,11 +72,26 @@ public class ChunkGenerator
           worldManager.LazyChunks.Remove(activeGridKey);
           worldManager.ActiveChunks.Add(lazyChunk.key, lazyChunk);
 
-          worldManager.chunksPackage.Add(lazyChunk.key);
+          foreach (var asteroid in lazyChunk.asteroidSmall)
+          {
+            var newAsteroidObject = Object.Instantiate(worldManager.smallAsteroidPrefab, asteroid.Value.position, Quaternion.identity);
+            asteroid.Value.asteroidObject = newAsteroidObject;
+
+            lazyChunk.chunkObject.SetActive(true);
+            newAsteroidObject.transform.parent = lazyChunk.chunkObject.transform;
+
+            NetworkServer.Spawn(newAsteroidObject);
+          }
         }
         else if (worldManager.ActiveChunks.ContainsKey(activeGridKey))
         {
-          worldManager.chunksPackage.Add(activeGridKey);
+          
+        }
+        else if (worldManager.AllChunks.ContainsKey(activeGridKey))
+        {
+          Chunk allChunk = worldManager.AllChunks[activeGridKey];
+
+          worldManager.ActiveChunks.Add(allChunk.key, allChunk);
         }
         else
         {
@@ -89,8 +104,6 @@ public class ChunkGenerator
       activeGridKey.y++;
       activeGridKey.x -= 3;
     }
-
-    worldManager.PrepareActiveChunksPackage(player.GetComponent<NetworkIdentity>().connectionToClient);
   }
 
   public void DeactivateActiveChunks()
@@ -101,6 +114,10 @@ public class ChunkGenerator
       foreach (var activeChunk in worldManager.ActiveChunks)
       {
         worldManager.InactiveChunks.Add(activeChunk.Key, activeChunk.Value);
+        foreach (var asteroid in activeChunk.Value.asteroidSmall)
+        {
+          NetworkServer.Destroy(asteroid.Value.asteroidObject);
+        }
       }
 
       worldManager.ActiveChunks.Clear();
@@ -125,8 +142,4 @@ public class ChunkGenerator
 			Mathf.RoundToInt(position.y / CHUNK_DIAMETER)
 		);
 	}
-
-	private void SetRandomSeed() => seed = (uint)Random.Range(0, int.MaxValue);
-
-	public void SetSeed(uint _seed) => seed = _seed;
 }

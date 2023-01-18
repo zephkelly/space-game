@@ -45,6 +45,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f399fbd634a4e1b4bb42b97788f337ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  clientPlayer: {fileID: 0}
+  players: []
+  smallAsteroidPrefab: {fileID: 7330672533130132280, guid: 843282064206188418b835edd2e41cf5, type: 3}
 --- !u!114 &8909785139706921877
 MonoBehaviour:
   m_ObjectHideFlags: 0
