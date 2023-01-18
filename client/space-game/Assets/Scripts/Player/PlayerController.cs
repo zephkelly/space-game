@@ -188,26 +188,16 @@ public class PlayerController : NetworkBehaviour
     }
   }
 
-
-  private bool collisionLocalhost = false;
   private void OnParticleCollision(GameObject hitObject)
   {
     if (isServer && isLocalPlayer)
     { 
-      //Prevent double registering of collisions for self hosted server + client
-      if (!collisionLocalhost) {
-        collisionLocalhost = true;
-        return;
-      }
-
       if (hitObject.tag == "Enemy") {
         //Update health on server
         TakeDamage(10);
 
         //Upate health on client
         TargetTakeDamage(hitObject.GetComponentInParent<PlayerController>().connectionToClient, 10);
-        
-        collisionLocalhost = false;
       }
     }
     else if (isServer && !isLocalPlayer)

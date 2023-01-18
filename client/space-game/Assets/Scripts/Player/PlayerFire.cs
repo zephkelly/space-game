@@ -26,6 +26,12 @@ public class PlayerFire : NetworkBehaviour
   private void Fire()
   {
     weaponParticleFire.Shoot();
+    
+    if (isServer && isClient) {
+      RpcFire();
+      return;
+    }
+    
     CmdFire();
   }
 
@@ -33,6 +39,8 @@ public class PlayerFire : NetworkBehaviour
   private void CmdFire()
   {
     weaponParticleFire.Shoot();
+
+    if (isServer && isClient) return;
     RpcFire();
   }
   
