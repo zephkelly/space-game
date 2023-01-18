@@ -128,18 +128,32 @@ public class WorldManager : NetworkBehaviour
   }
 
   public List<Vector2Int> chunksPackage = new List<Vector2Int>();
+  private List<Vector2Int> lastChunkPackage = new List<Vector2Int>();
 
   [Server]
   public void PrepareActiveChunksPackage(NetworkConnection target)
   {
-    //Create bundled package
-    Vector2Int[] activeChunksBundle = new Vector2Int[chunksPackage.Count];
+    var deltaChunks = new List<Vector2Int>();
+
+    //Find identical chunks
+    foreach (var chunk in chunksPackage) {
+      if (lastChunkPackage.Contains(chunk)) continue;
+
+      deltaChunks.Add(chunk);
+    }
+
+    lastChunkPackage.Clear();
+
+    // Bundle package
+    Vector2Int[] activeChunksBundle = new Vector2Int[deltaChunks.Count];
 
     for (int i = 0; i < activeChunksBundle.Length; i++) {
-      activeChunksBundle[i] = chunksPackage[i];
+      activeChunksBundle[i] = deltaChunks[i];
     }
 
     TargetSendActiveChunksPackage(target, activeChunksBundle);
+    chunksPackage.CopyTo(lastChunkPackage);
+    chunksPackage.Clear();
   }
 
   [TargetRpc]

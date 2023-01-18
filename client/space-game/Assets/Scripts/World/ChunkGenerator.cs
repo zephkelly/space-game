@@ -36,7 +36,7 @@ public class ChunkGenerator
         }
         else
         {
-          GameObject newChunk = new GameObject("Chunk " + CHUNK_NUMBER);
+          GameObject newChunk = new GameObject("Chunk: " + CHUNK_NUMBER + " (" + lazyGridKey + ")");
           newChunk.transform.parent = worldManager.transform;
           newChunk.SetActive(false);
 
